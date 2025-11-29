@@ -2,9 +2,10 @@
 // Name: BattleShipCPE223
 // Author: Wyatt Bowman
 // Date: 11/29/25
-// Version: V0.5
-// Description: user can now rotate boats and there is a detection/reset feature with the placement algoirthim
-// Changes: updated and added alot of features to the getUserBoatPlacement function, mainly validating user input
+// Version: V0.6
+// Description: ASCII code yay
+// Changes: Added basic ascii code functions for win condition, maybe add some more art later.
+//          Also added a prototype for a pause function, need more features before I can test.
 //==========================================
 
 #include <stdio.h>
@@ -16,14 +17,17 @@
 
 int startScreen(int);
 void battleShipCover_ASCII();
+void battleShipPause_ASCII();
+void pause(char player[2][100]);
+void winScreen_ASCII(int booleanTurn);
 void displayBoard(char player[2][100], bool, int, char playerInput[2][10][10][3], char fogPlayerData[2][10][10][3]);
 void getUserBoatPlacement(char playerData[2][10][10][3], char fogPlayerData[2][10][10][3], char boardPieces[5][3],
-                          char playerName[2][100], int turn, int boatLength[5]);
+                          char playerName[2][100], int, int boatLength[5]);
 
 int main()
 {
     //Start Variables
-    int userX, userY, mainScreenOption, oldMainScreenOption, rotate, turn = 0;
+    int userX, userY, mainScreenOption = -1, oldMainScreenOption, rotate, turn = 0, booleanTurn = 0;
     int boatLength[5] = {5, 4, 3, 3, 2};
 
     char playerData[2][10][10][3]; // player, row, column, max size of char
@@ -65,22 +69,26 @@ int main()
                     }
                 }
             }
+            for(int g = 0; g < 2; g++){
+                getUserBoatPlacement(playerData, fogPlayerData, boardPieces, playerName, g, boatLength);
+            }
 
-            getUserBoatPlacement(playerData, fogPlayerData, boardPieces, playerName, turn, boatLength);
 
             while(1){ // need win condition
 
-                displayBoard(playerName, screenShake, turn, playerData, fogPlayerData); // just testing output
+                displayBoard(playerName, screenShake, booleanTurn, playerData, fogPlayerData); // just testing output
 
                 if(screenShake){
                     for(int shakeAmount = 0; shakeAmount < 4; shakeAmount++){
-                        displayBoard(playerName, shakeAmount % 2 == 0, turn, playerData, fogPlayerData);
+                        displayBoard(playerName, shakeAmount % 2 == 0, booleanTurn, playerData, fogPlayerData);
                         _sleep(500); //sleep 100ms from windows.h
                     }
                 }
 
                 scanf("%d");
                 turn++;
+                booleanTurn = turn % 2;
+
             }
         break;
         case 2: // HELP OPTION
@@ -141,8 +149,7 @@ int startScreen(int option){ // main screen code, helps select and change user i
 
 void displayBoard(char player[2][100], bool screenShake, int turn, char playerInput[2][10][10][3], char fogPlayerInput[2][10][10][3]){
     system("cls"); // clears terminal
-    int booleanTurn = turn % 2;
-    printf("\n\tPlayer %d's Board: %-50sFog of War\n\n", booleanTurn + 1, player[booleanTurn]); // header display, using fixed width Field
+    printf("\n\tPlayer %d's Board: %-50sFog of War\n\n", turn + 1, player[turn]); // header display, using fixed width Field
 
         for (int j = 0; j < 10; j++) // current player line
             printf("+----");
@@ -158,11 +165,11 @@ void displayBoard(char player[2][100], bool screenShake, int turn, char playerIn
             printf("  "); // 2 space offset for the screenshake
 
         for (int j = 0; j < 10; j++) // current players line
-            printf("| %s ", playerInput[booleanTurn][i][j]);
+            printf("| %s ", playerInput[turn][i][j]);
         printf("|\t"); // Print vertical sides of each cell
 
         for (int j = 0; j < 10; j++)  // opponent players lines
-            printf("| %s ", fogPlayerInput[booleanTurn][i][j]);
+            printf("| %s ", fogPlayerInput[turn][i][j]);
         printf("|\n");
 
         if(screenShake && (i % 2 == 0)) // screenshake code
@@ -265,7 +272,7 @@ void getUserBoatPlacement(char playerData[2][10][10][3], char fogPlayerInput[2][
                         valid = 0;
                         break;
                     }
-                }else{//invalid input
+                }else{ //invalid input and not invalid placement
                     valid = 0;
                     break;
                     }
@@ -291,6 +298,18 @@ void getUserBoatPlacement(char playerData[2][10][10][3], char fogPlayerInput[2][
     }
 }
 
+void pause(char player[2][100]){
+    char pauseIn;
+    battleShipPause_ASCII();
+    printf("\n\n\n\t\t\t   Enter anything except 'L' to Unpause \n\n");
+    printf("If player %s would like to surrender, enter 'L'", player[2]);
+    scanf(" %c", &pauseIn);
+    if(pauseIn == 'L' || pauseIn == 'l'){}
+        // INSERT WIN CONDITION WILL NEED TO USE POINTER TO ACCESS AND CHANGE
+}
+
+
+
 // ASCII ART START HERE
 
 void battleShipCover_ASCII(){
@@ -305,3 +324,63 @@ void battleShipCover_ASCII(){
     printf("                   \\/\\_____\\  \\ \\_\\ \\_\\  \\ \\_\\  \\ \\_\\            \n");
     printf("                    \\/_____/   \\/_/\\/_/   \\/_/   \\/_/            \n");
 }
+
+void battleShipPause_ASCII(){
+    printf("______       _   _   _        _____ _     _        \n");
+    printf("| ___ \\     | | | | | |      /  ___| |   (_)       \n");
+    printf("| |_/ / __ _| |_| |_| | ___  \\ `--.| |__  _ _ __   \n");
+    printf("| ___ \\/ _` | __| __| |/ _ \\  `--. \\ '_ \\| | '_ \\  \n");
+    printf("| |_/ / (_| | |_| |_| |  __/ /\\__/ / | | | | |_) | \n");
+    printf("\\____/ \\__,_|\\__|\\__|_|\\___| \\____/|_| |_|_| .__/  \n");
+    printf("                                           | |     \n");
+    printf("                                           |_|     \n");
+}
+
+void winScreen_ASCII(int booleanTurn){
+if(booleanTurn){
+     printf(" ________  ___       ________      ___    ___ _______   ________          _________  ___       __   ________     \n");
+    printf("|\\   __  \\|\\  \\     |\\   __  \\    |\\  \\  /  /|\\  ___ \\ |\\   __  \\        |\\___   ___\\\\  \\     |\\  \\|\\   __  \\    \n");
+    printf("\\ \\  \\|\\  \\ \\  \\    \\ \\  \\|\\  \\   \\ \\  \\/  / | \\   __/|\\ \\  \\|\\  \\       \\|___ \\  \\_\\ \\  \\    \\ \\  \\ \\  \\|\\  \\   \n");
+    printf(" \\ \\   ____\\ \\  \\    \\ \\   __  \\   \\ \\    / / \\ \\  \\_|/_\\ \\   _  _\\           \\ \\  \\ \\ \\  \\  __\\ \\  \\ \\  \\\\\\  \\  \n");
+    printf("  \\ \\  \\___|\\ \\  \\____\\ \\  \\ \\  \\   \\/  /  /   \\ \\  \\_|\\ \\ \\  \\\\  \\|           \\ \\  \\ \\ \\  \\|\\__\\_\\  \\ \\  \\\\\\  \\ \n");
+    printf("   \\ \\__\\    \\ \\_______\\ \\__\\ \\__\\__/  / /      \\ \\_______\\ \\__\\\\ _\\            \\ \\__\\ \\ \\____________\\ \\_______\\\n");
+    printf("    \\|__|     \\|_______|\\|__|\\|__|\\___/ /        \\|_______|\\|__|\\|__|            \\|__|  \\|____________|\\|_______|\n");
+    printf("                                 \\|___|/                                                                         \n");
+    printf("                                                                                                                 \n");
+    printf("                                                                                                                 \n");
+    printf("                                ___       __   ___  ________   ________                                          \n");
+    printf("                               |\\  \\     |\\  \\|\\  \\|\\   ___  \\|\\   ____\\                                         \n");
+    printf("                               \\ \\  \\    \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\___|_                                        \n");
+    printf("                                \\ \\  \\  __\\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\_____  \\                                       \n");
+    printf("                                 \\ \\  \\|\\__\\_\\  \\ \\  \\ \\  \\\\ \\  \\|____|\\  \\                                      \n");
+    printf("                                  \\ \\____________\\ \\__\\ \\__\\\\ \\__\\____\\_\\  \\                                     \n");
+    printf("                                   \\|____________|\\|__|\\|__| \\|__|\\_________\\                                    \n");
+    printf("                                                                 \\|_________|                                    \n");
+    printf("                                                                                                                 \n");
+    printf("                                                                                                                 \n");
+} else if(!booleanTurn){
+    printf(" ________  ___       ________      ___    ___ _______   ________          ________  ________   _______          \n");
+    printf("|\\   __  \\|\\  \\     |\\   __  \\    |\\  \\  /  /|\\  ___ \\ |\\   __  \\        |\\   __  \\|\\   ___  \\|\\  ___ \\         \n");
+    printf("\\ \\  \\|\\  \\ \\  \\    \\ \\  \\|\\  \\   \\ \\  \\/  / | \\   __/|\\ \\  \\|\\  \\       \\ \\  \\|\\  \\ \\  \\\\ \\  \\ \\   __/|        \n");
+    printf(" \\ \\   ____\\ \\  \\    \\ \\   __  \\   \\ \\    / / \\ \\  \\_|/_\\ \\   _  _\\       \\ \\  \\\\\\  \\ \\  \\\\ \\  \\ \\  \\_|/__      \n");
+    printf("  \\ \\  \\___|\\ \\  \\____\\ \\  \\ \\  \\   \\/  /  /   \\ \\  \\_|\\ \\ \\  \\\\  \\|       \\ \\  \\\\\\  \\ \\  \\\\ \\  \\ \\  \\_|\\ \\     \n");
+    printf("   \\ \\__\\    \\ \\_______\\ \\__\\ \\__\\__/  / /      \\ \\_______\\ \\__\\\\ _\\        \\ \\_______\\ \\__\\\\ \\__\\ \\_______\\    \n");
+    printf("    \\|__|     \\|_______|\\|__|\\|__|\\___/ /        \\|_______|\\|__|\\|__|        \\|_______|\\|__| \\|__|\\|_______|    \n");
+    printf("                                 \\|___|/                                                                         \n");
+    printf("                                                                                                                 \n");
+    printf("                                                                                                                 \n");
+    printf("                                ___       __   ___  ________   ________                                         \n");
+    printf("                               |\\  \\     |\\  \\|\\  \\|\\   ___  \\|\\   ____\\                                        \n");
+    printf("                               \\ \\  \\    \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\___|_                                       \n");
+    printf("                                \\ \\  \\  __\\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\_____  \\                                      \n");
+    printf("                                 \\ \\  \\|\\__\\_\\  \\ \\  \\ \\  \\\\ \\  \\|____|\\  \\                                     \n");
+    printf("                                  \\ \\____________\\ \\__\\ \\__\\\\ \\__\\____\\_\\  \\                                    \n");
+    printf("                                   \\|____________|\\|__|\\|__| \\|__|\\_________\\                                   \n");
+    printf("                                                                 \\|_________|                                   \n");
+    printf("                                                                                                                 \n");
+    printf("                                                                                                                 \n");
+}
+
+
+}
+
