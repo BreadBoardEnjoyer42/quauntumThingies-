@@ -15,9 +15,7 @@
 #include <stdbool.h>
 
 
-int setBoats(int, int, int, int);
 int startScreen(int);
-void showBoard(); // declaring function that shows board
 void battleShipCover_ASCII();
 void displayBoard(char player[2][100], bool, int, char playerInput[2][10][10][3], char fogPlayerData[2][10][10][3]);
 void getUserBoatPlacement(char playerData[2][10][10][3], char fogPlayerData[2][10][10][3], char boardPieces[5][3], char playerName[2][100],
