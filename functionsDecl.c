@@ -11,10 +11,13 @@ int validateUserInput(char *out);
 
 void pause(char player[2][100]);
 
-void displayBoard(char player[2][100], bool, int, char playerInput[2][10][10][3]);
+void displayBoard(char player[2][100], bool screenShake, int turn, int playerInput[2][10][10], char shipValueAbrv[14][5]);
 
-void getUserBoatPlacement(char playerData[2][10][10][3], char boardPieces[5][3],
-                          char playerName[2][100], int, int boatLength[5]);
+void printPlayerBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]);
+
+void printPlayerFogBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]);
+
+void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], int turn, int boatLength[5], int shipValueType[5], char shipValueAbrv[14][5], char ships[5][20]);
 // END MAIN LOGIC FUNCTIONS
 
 // ASCII CODE FUNCTIONS
