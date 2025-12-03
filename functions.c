@@ -15,7 +15,7 @@ int validateUserInput(char *out){
        return 0; // EXIT_SUCCESS
 
     char value, bufferCheck;
-    static int pCheck = 0;// for using P as a toggle and static so it keeps its value
+    static int pCheck = 1;// for using P as a toggle and static so it keeps its value
 
     if(sscanf(line, " %c %c", &value, &bufferCheck) == 1){
         *out = value;
@@ -148,7 +148,7 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
             printf("Invalid Input");
             }
 
-            playerData[turn][vert][hori]; // put old cell back
+            playerData[turn][vert][hori] = prevLocation; // put old cell back
 
             if(input == 'w' || input == 'W')
                 newVert--; // make switch statement later
@@ -182,6 +182,7 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
         }
 
         printf("Place Boat %s (Length %d). Enter H for horizontal and V for vertical\n", ships[i], boatLength[i]);
+        playerData[turn][vert][hori] = prevLocation; // SLAP SLAP
 
         while(!validateUserInput(&orientation)){ // running validation check for user input
             printf("Invalid Input");
@@ -190,6 +191,10 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
 
         while(!valid){
             valid = true; // only changes if invalid
+            if (playerData[turn][vert][hori] != 0) { // SLAP SLAP
+                valid = false;                      // SLAP SLAP
+                break;                              // SLAP SLAP
+            }
             for(int k = 1; k < boatLength[i]; k++){ // CHECKING BEFORE PLACING
                 // If triggered on V and H then need escape sequence
                 if(orientation == 'V' || orientation == 'v'){
