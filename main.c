@@ -1,10 +1,10 @@
 //==========================================
 // Name: BattleShipCPE223
-// Author: Wyatt Bowman
+// Author: Kieran Cavanagh
 // Date: 12/2/25
-// Version: V0.9
+// Version: V0.8
 // Description: battleships- the game
-// Changes: Adding Attacking
+// Changes: converting to full integer implementation.
 //==========================================
 
 #include <stdio.h>
@@ -91,6 +91,7 @@ int main(){
         break;
         case 3: // CREDITS
             printf("\n\nDeveloped by Wyatt Bowman and Kieran Cavanagh\n\n");
+            titleScreen();
         break;
         default:
             printf("Invalid Input, Try again");
