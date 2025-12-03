@@ -11,13 +11,20 @@
 //Function for getting valid user input
 int validateUserInput(char *out){
     char line[128];  // 16 byte
-    if(!fgets(line, sizeof(line), stdin))
+    if(!fgets(line, sizeof(line), stdin)) // validating string for sscanf
        return 0; // EXIT_SUCCESS
 
     char value, bufferCheck;
+    static int pCheck = 0;// for using P as a toggle and static so it keeps its value
 
     if(sscanf(line, " %c %c", &value, &bufferCheck) == 1){
         *out = value;
+        if(value == 'p' || value == 'P'){
+            pCheck++;
+                if(!(pCheck % 2)){ // TOGGLE FUNCTION
+                    pause();
+                }
+        }
         return 1; // EXIT_FAILURE
     }
     return 0;
@@ -90,7 +97,7 @@ void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int pl
 }
 
 void printPlayerBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]){
-    for (int col=0;col<10;col++){
+    for (int col = 0;col < 10;col++){
         printf("|");
         printf(shipValueAbrv[playerInput[player][row][col]]);
     }
@@ -98,7 +105,7 @@ void printPlayerBoardRow(int player,int row,int playerInput[2][10][10],char ship
 }
 
 void printPlayerFogBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]){
-    for (int col=0;col<10;col++){
+    for (int col = 0;col < 10;col++){
         printf("|");
         if (playerInput[player][row][col]==1){
             printf("Miss");
@@ -163,16 +170,17 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
             if(newHori > 9)
                 newHori = 0;
 
-            if(playerData[turn][newVert][newHori] % 12 != 0){ //checking the validity of the square
+            if(playerData[turn][newVert][newHori]%12 != 0){ //checking the validity of the square
                 printf("This Cell is Taken, Try Again!\n");
                 continue;
             }
-            playerData[turn][vert][hori]=prevLocation; // erase old cursor
+            playerData[turn][vert][hori] = prevLocation; // erase old cursor
             vert = newVert;
             hori = newHori;
-            prevLocation=playerData[turn][vert][hori];
-            playerData[turn][vert][hori]=12; //user cursor
+            prevLocation = playerData[turn][vert][hori];
+            playerData[turn][vert][hori] = 12; //user cursor
         }
+
         printf("Place Boat %s (Length %d). Enter H for horizontal and V for vertical\n", ships[i], boatLength[i]);
 
         while(!validateUserInput(&orientation)){ // running validation check for user input
@@ -236,15 +244,21 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
 
 
 // Pause Function Prototype
-void pause(char player[2][100]){
+void pause(){
+    system("cls");
     char pauseIn;
     battleShipPause_ASCII();
-    printf("\n\n\n\t\t\t   Enter anything except 'L' to Unpause \n\n");
-    printf("If player %s would like to surrender, enter 'L'", player[2]);
-    while(!validateUserInput(&pauseIn)){ // running validation check for user input
+    printf("\n\n\nEnter anything except 'L' or 'P' to Unpause \n\n"); // MAKE TOGGLE
+    printf("If player would like to surrender, enter 'L'");
+
+    while(pauseIn != 'p' && pauseIn != 'P'){
+        while(!validateUserInput(&pauseIn)){ // running validation check for user input
             printf("Invalid Input");
         }
-    if(pauseIn == 'L' || pauseIn == 'l'){}
+        if(pauseIn == 'L' || pauseIn == 'l'){
+            printf("Don't give up now! We haven't developed a way for you to lose :\ ");
+        }
+    }
         // INSERT WIN CONDITION WILL NEED TO USE POINTER TO ACCESS AND CHANGE
 }
 // END Pause Function Prototype
@@ -272,13 +286,14 @@ void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], c
     bool valid;
     int attackRow = 0;
     int attackCol = 0;
+    static int CHECK[10][10] = {0}; // static so its not redefined every time
 
     input = 0; // reset the input so while loop triggers again
     newRow = attackRow;
     newCol = attackCol;
     prevLocation = playerData[turn][attackRow][attackCol]; //copy into temp variable
 
-        while(!((input=='q')||(input=='Q'))){
+        while(!((input == 'q')||(input == 'Q'))){
             displayBoard(playerName, 0, turn, playerData, shipValueAbrv); // show placement
             printf("\nPlace your Attack with W/A/S/D, Q when finished\n");
             while(!validateUserInput(&input)){ // running validation check for user input
@@ -318,7 +333,10 @@ void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], c
 
         }
             playerData[turn][attackRow][attackCol] = prevLocation;
-            playerData[(!turn)][newRow][newCol] += 1;
+            if(CHECK[newRow][newCol] == 0){
+                playerData[(!turn)][newRow][newCol] += 1;
+                CHECK[newRow][newCol]++;
+            }
             displayBoard(playerName, 0, turn, playerData, shipValueAbrv); // display
 }
 
