@@ -8,7 +8,7 @@ int startScreen(int);
 
 int validateUserInput(char *out);
 
-void pause(char player[2][100]);
+void pause();
 
 void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int playerInput[2][10][10], char shipValueAbrv[14][5]);
 
