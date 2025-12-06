@@ -152,24 +152,25 @@ void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], in
                           char ships[5][20]){
 
     char input, orientation;
-    int hori, vert, newVert, newHori, prevLocation;
+    int hori = 0, vert = 0, newVert, newHori, prevLocation = 0;
     bool valid;
 
     for(int i = 0; i < 5; i++){
         selectionStart:
         input = 0; // reset the input so while loop triggers again
-        hori = 0; // reset every time NEED TO MAKE SURE IF USER PLACES BOAT AT ORIGIN WE FILTER FOR THAT
-        vert = 0;
+        findEmptyCell(playerData, &hori, &vert, turn);
         newHori = hori;
         newVert = vert;
-        prevLocation=playerData[turn][vert][hori]; //copy into temp variable
+        prevLocation = playerData[turn][vert][hori]; //copy into temp variable
+
         playerData[turn][vert][hori] = 12; //user cursor
 
         while(!((input=='q')||(input=='Q'))){
             displayBoard(playerName, 0, turn, playerData, shipValueAbrv); // show placement
             printf("\nEnter a direction with W/A/S/D, Q when finished\n");
+
             while(!validateUserInput(&input)){ // running validation check for user input
-            printf("Invalid Input");
+                printf("Invalid Input");
             }
 
             playerData[turn][vert][hori] = prevLocation; // put old cell back
@@ -198,6 +199,7 @@ void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], in
                 printf("This Cell is Taken, Try Again!\n");
                 continue;
             }
+
             playerData[turn][vert][hori] = prevLocation; // erase old cursor
             vert = newVert;
             hori = newHori;
@@ -403,6 +405,17 @@ void displayBoardHeader(int booleanTurn, char player[2][100]) {
     }
     printf("Fog of War\n");
 
+}
+
+void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanTurn){
+        while(playerData[booleanTurn][*vert][*hori] != 0){ // CHECKING TO SEE THE NEXT VALID PLACE TO PUT THE CURSOR
+            (*hori)++;
+            if((*hori) >= size){ // IF MAX THEN GO DOWN A LINE
+                (*vert)++; // change vertically
+                *hori = 0; // back to 0th x index
+                continue;
+            }
+        }
 }
 
 
