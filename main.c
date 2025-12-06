@@ -2,9 +2,9 @@
 // Name: BattleShipCPE223
 // Author: Wyatt Bowman
 // Date: 12/6/25
-// Version: V0.12
-// Description: Bug Fix
-// Changes: Fixed big where if the user places anything at the origin then it would let them place over
+// Version: V0.13
+// Description: Added Screen Shake
+// Changes: Added a pass by reference value to the attack smack function such that after the users turn there is a screen shake if there is a hit
 //
 //==========================================
 
@@ -73,18 +73,26 @@ int main(){
 
             while(1){ // need win condition
 
-                displayBoard(playerName, screenShake, booleanTurn, playerData, shipValueAbrv); // just testing output
-
                 if(screenShake){
-                    for(int shakeAmount = 0; shakeAmount < 4; shakeAmount++){
+                    for(int shakeAmount = 0; shakeAmount < 8; shakeAmount++){
                         displayBoard(playerName, (!(shakeAmount % 2)), booleanTurn, playerData, shipValueAbrv);
-                        _sleep(500); //sleep 100ms from windows.h
+                        _sleep(200); //sleep 100ms from windows.h
                     }
+                screenShake = false;
                 }
-                attackSmack(booleanTurn, playerData, playerName, shipValueAbrv);
+
+
+
+                displayBoard(playerName, 0, booleanTurn, playerData, shipValueAbrv); // just testing output
+                //Display The board
+                attackSmack(booleanTurn, playerData, playerName, shipValueAbrv, &screenShake);
+                //ATTACKKKKKKKKKKKKK
                 turn++;
+                //next persons turn
                 booleanTurn = turn % 2;
+                // for switching back and forth
                 transistion(booleanTurn);
+                //in between slide
             }
         break;
         case 2: // HELP OPTION
