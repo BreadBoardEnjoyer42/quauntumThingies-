@@ -29,6 +29,28 @@ int validateUserInput(char *out){
     }
     return 0;
 }
+
+int validateUserInputInt(int *out){
+    char line[128];  // 16 byte
+    if(!fgets(line, sizeof(line), stdin)) // validating string for sscanf
+       return 0; // EXIT_SUCCESS
+
+    int value;
+    char bufferCheck;
+    static int pCheck = 1;// for using P as a toggle and static so it keeps its value
+
+    if(sscanf(line, " %d %c", &value, &bufferCheck) == 1){
+        *out = value;
+        if(value == 'p' || value == 'P'){
+            pCheck++;
+                if(!(pCheck % 2)){ // TOGGLE FUNCTION
+                    pause();
+                }
+        }
+        return 1; // EXIT_FAILURE
+    }
+    return 0;
+}
 // END Function for validating user input
 
 
@@ -61,19 +83,20 @@ int startScreen(int option){ // main screen code, helps select and change user i
 
 
 // Display Board Function to show the board with improved GUI
-void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int playerInput[2][10][10], char shipValueAbrv[14][5]){
+void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int playerInput[2][20][20],
+                  char shipValueAbrv[14][5]){
     system("cls"); // clears terminal
-    printf("\n\tPlayer %d's Board: %-50sFog of War\n\n", booleanTurn + 1, player[booleanTurn]); // header display, using fixed width Field
+    displayBoardHeader(booleanTurn, player); // For centering the headers for the fog of war and player data because board is variable
 
-        for (int j = 0; j < 10; j++) // current player line
+        for (int j = 0; j < size; j++) // current player line
             printf("+----");
         printf("+\t"); // print the last line and tab over for second grid
 
-        for (int j = 0; j < 10; j++) // opponent player line
+        for (int j = 0; j < size; j++) // opponent player line
             printf("+----");
         printf("+\n"); // Print vertical sides of each cell
 
-    for (int i = 0; i < 10; i++) {// Print top border of each cell
+    for (int i = 0; i < size; i++) {// Print top border of each cell
         if(screenShake && (i % 2 == 0)) // screenshake code
             printf("  "); // 2 space offset for the screenshake
 
@@ -86,26 +109,26 @@ void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int pl
             printf("  "); // 2 space offset for the screenshake
 
         // note to self, insert data on the second for loop somewhere in the middle, workout line spacing and such later.
-        for (int j = 0; j < 10; j++) // Print bottom border of the last row
+        for (int j = 0; j < size; j++) // Print bottom border of the last row
             printf("+----");
         printf("+\t"); // last line for the current players layout
 
-        for (int j = 0; j < 10; j++) // Print bottom border of the last row
+        for (int j = 0; j < size; j++) // Print bottom border of the last row
             printf("+----");
         printf("+\n"); // last "+" before newline
     }
 }
 
-void printPlayerBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]){
-    for (int col = 0;col < 10;col++){
+void printPlayerBoardRow(int player,int row,int playerInput[2][20][20],char shipValueAbrv[14][5]){
+    for (int col = 0; col < size; col++){
         printf("|");
         printf(shipValueAbrv[playerInput[player][row][col]]);
     }
     printf("|");
 }
 
-void printPlayerFogBoardRow(int player,int row,int playerInput[2][10][10],char shipValueAbrv[14][5]){
-    for (int col = 0;col < 10;col++){
+void printPlayerFogBoardRow(int player,int row,int playerInput[2][20][20],char shipValueAbrv[14][5]){
+    for (int col = 0;col < size; col++){
         printf("|");
         if (playerInput[player][row][col]==1){
             printf("Miss");
@@ -124,8 +147,9 @@ void printPlayerFogBoardRow(int player,int row,int playerInput[2][10][10],char s
 
 
 // Handling User Input for Boat Placement Function
-void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], int turn, int boatLength[5], int shipValueType[5],
-                          char shipValueAbrv[14][5], char ships[5][20]){
+void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], int turn,
+                          int boatLength[5], int shipValueType[5],char shipValueAbrv[14][5],
+                          char ships[5][20]){
 
     char input, orientation;
     int hori, vert, newVert, newHori, prevLocation;
@@ -162,12 +186,12 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
                 continue; //if user quits they don't have to change the state
 
             if(newVert < 0)
-                newVert = 9; //checking is user input is valid or not by forcing bounds
-            if(newVert > 9)
-                newVert = 0;
+                newVert = size - 1; //checking is user input is valid or not by forcing bounds
+            if(newVert > size - 1)
+                newVert = size - 1;
             if(newHori < 0)
-                newHori = 9;
-            if(newHori > 9)
+                newHori = size - 1;
+            if(newHori >  size - 1)
                 newHori = 0;
 
             if(playerData[turn][newVert][newHori]%12 != 0){ //checking the validity of the square
@@ -192,13 +216,13 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
         while(!valid){
             valid = true; // only changes if invalid
             if (playerData[turn][vert][hori] != 0) { // SLAP SLAP
-                valid = false;                      // SLAP SLAP
-                break;                              // SLAP SLAP
+                valid = false;                       // SLAP SLAP
+                break;                               // SLAP SLAP
             }
             for(int k = 1; k < boatLength[i]; k++){ // CHECKING BEFORE PLACING
                 // If triggered on V and H then need escape sequence
                 if(orientation == 'V' || orientation == 'v'){
-                    if((vert + boatLength[i]) > 10){
+                    if((vert + boatLength[i]) > size){
                         valid = false;
                         break;
                     }
@@ -208,7 +232,7 @@ void getUserBoatPlacement(int playerData[2][10][10], char playerName[2][100], in
                     }
                 }
                 else if(orientation == 'H' || orientation == 'h'){
-                    if((hori + boatLength[i]) > 10){
+                    if((hori + boatLength[i]) > size){
                         valid = false;
                         break;
                     }
@@ -283,7 +307,7 @@ void transistion(int booleanTurn){
 
 
 
-void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], char shipValueAbrv[14][5]){
+void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], char shipValueAbrv[14][5]){
     selectionStart:
 
     char input, orientation;
@@ -291,7 +315,7 @@ void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], c
     bool valid;
     int attackRow = 0;
     int attackCol = 0;
-    static int CHECK[10][10] = {0}; // static so its not redefined every time
+    static int CHECK[20][20] = {0}; // static so its not redefined every time
 
     input = 0; // reset the input so while loop triggers again
     newRow = attackRow;
@@ -319,12 +343,12 @@ void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], c
                 continue; //if user quits they don't have to change the state
 
             if(newCol < 0)
-                newCol = 9; //checking is user input is valid or not by forcing bounds
-            if(newCol > 9)
+                newCol = size; //checking is user input is valid or not by forcing bounds
+            if(newCol > size)
                 newCol = 0;
             if(newRow < 0)
-                newRow = 9;
-            if(newRow > 9)
+                newRow = size;
+            if(newRow > size)
                 newRow = 0;
 
             if(playerData[turn][newRow][newCol] % 12 != 0){ //checking the validity of the square
@@ -345,14 +369,42 @@ void attackSmack(int turn, int playerData[2][10][10], char playerName[2][100], c
             displayBoard(playerName, 0, turn, playerData, shipValueAbrv); // display
 }
 
-/*
-    printf("What row do you want to attack?");
-    scanf("%d",&attackRow);
-    printf("What column do you want to attack?");
-    scanf("%d",&attackCol);
-    playerData[(!player)][attackRow][attackCol]+=1;
+int getSize(int *sizeF){
+    int count = 0, out = 0;
+    printf("What size would you like the board to be?\n");
+
+    while(out > MAX_SIZE || out < MIN_SIZE){
+        if(count != 0){
+            printf("\nPlease stay between the bounds of %d and %d\n", MAX_SIZE, MIN_SIZE);
+        }
+
+        while(!validateUserInputInt(&out)){ // running validation check for user input
+                printf("Invalid Input\n");
+        }
+        printf("%d", out);
+        *sizeF = out;
+        count++;
+    }
+    return 1;
 }
-*/
+
+
+void displayBoardHeader(int booleanTurn, char player[2][100]) {
+    int gridWidth = size * 5 + 1;  // width of one grid
+    int sizePlayerOffset = strlen("Player #'s Board: ") + strlen(player[booleanTurn]); // how long is said string
+    int sizeFogOffset = strlen("Fog of War");
+    printf("\n");
+    for(int y = (gridWidth/2 - sizePlayerOffset/2); y > 0; y--){ // add spaces for half the length of the grid AND half the string
+        printf(" ");
+    }
+    printf("Player %d's Board: %s", booleanTurn + 1 , player[booleanTurn]);
+    for(int y = (gridWidth - sizePlayerOffset + sizeFogOffset/2) + 5; y > 0; y--){ // same algorithm
+        printf(" ");
+    }
+    printf("Fog of War\n");
+
+}
+
 
 
 
