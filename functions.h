@@ -32,6 +32,8 @@ int getSize(int *sizeF);
 
 void displayBoardHeader(int booleanTurn, char player[2][100]);
 
+void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanTurn);
+
 
 // ASCII CODE FUNCTIONS
 void winScreen_ASCII(int booleanTurn);
