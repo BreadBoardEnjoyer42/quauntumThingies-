@@ -123,33 +123,30 @@ void printPlayerBoardRow(int player,int row,int playerInput[2][20][20],char ship
     for (int col = 0; col < size; col++){
         printf("|");
         int v = playerInput[player][row][col];
-        int v2 = playerInput[!player][row][col];
-            if(CHECK[player][row][col] != 0){
-                if((v2 % 2) == 1 && v2 > 2){
-                    printf("%sH", shipValueAbrv[v]);
-                }else{
-                    printf("%sM", shipValueAbrv[v]);
-                }
-            }else{
-                printf("%s ", shipValueAbrv[v]);
-            }
-    }
+            printf("%s", shipValueAbrv[v]);
+        }
 
     printf("|");
 }
 
 void printPlayerFogBoardRow(int player,int row,int playerInput[2][20][20],char shipValueAbrv[14][5]){
-    for (int col = 0;col < size; col++){
+    for (int col = 0; col < size; col++){
+        int v2 = playerInput[!player][row][col];
         printf("|");
-        if (playerInput[player][row][col]==1){
-            printf("Miss");
+        if(playerInput[player][row][col] == 12){
+            printf("%s", shipValueAbrv[playerInput[player][row][col]]);
+        }else{
+            if(CHECK[player][row][col] != 0){
+                if((v2 % 2) == 1 && v2 > 2){
+                    printf("%s", shipValueAbrv[v2]);
+                }else{
+                    printf("Miss");
+                }
+            }else{
+                printf(" ~~ ");
+            }
         }
-        else if ((playerInput[player][row][col])%2){
-            printf(" XX ");
-        }
-        else{
-            printf(" ~~ ");
-        }
+
     }
     printf("|");
 }
@@ -213,7 +210,7 @@ void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], in
             playerData[turn][vert][hori] = 12; //user cursor
         }
 
-        printf("Place Boat %s (Length %d). Enter H for horizontal and V for vertical\n", ships[i], boatLength[i]);
+        printf("Place %s (Length %d). Enter H for horizontal and V for vertical\n", ships[i], boatLength[i]);
         playerData[turn][vert][hori] = prevLocation; // SLAP SLAP
 
         while(!validateUserInput(&orientation)){ // running validation check for user input
