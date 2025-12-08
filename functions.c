@@ -445,7 +445,6 @@ void winCondition(int playerData[2][20][20], int booleanTurn){
                 for(int k = 0; k < 5; k++){
                     if(!(playerData[(!booleanTurn)][i][j] % (2*k+3))){
                         if(PCHECK[booleanTurn][i][j] == 0){
-                            oldPlayerPoints[booleanTurn] = playerPoints[booleanTurn];
                             if(playerData[!booleanTurn][i][j] == 9){
                                 playerPoints[booleanTurn] += 500;
                             } else {
