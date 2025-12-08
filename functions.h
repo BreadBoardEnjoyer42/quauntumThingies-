@@ -5,6 +5,8 @@
 #define MAX_SIZE 15
 #define MIN_SIZE 5
 extern int size; // size of board value
+extern int playerPoints[2];
+extern int CHECK[2][20][20];
 
 
 // MAIN LOGIC FUNCTIONS
@@ -27,7 +29,7 @@ void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], in
 void transistion(int);
 
 void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], char shipValueAbrv[14][5],
-                bool *screenShake);
+                bool *screenShake, bool airStrikeMode);
 
 int getSize(int *sizeF);
 
@@ -35,7 +37,9 @@ void displayBoardHeader(int booleanTurn, char player[2][100]);
 
 void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanTurn);
 
-void winCondition(int playerData[2][20][20], int booleanTurn, int *points);
+void winCondition(int playerData[2][20][20], int booleanTurn);
+
+void getMode(bool *airStrikeMode);
 
 
 // ASCII CODE FUNCTIONS
@@ -48,5 +52,7 @@ void battleShipPause_ASCII();
 void inbetweenScreen();
 
 void titleScreen();
+
+void surrender();
 
 #endif // FUNCTIONS_H_INCLUDED
