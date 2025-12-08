@@ -123,13 +123,18 @@ void printPlayerBoardRow(int player,int row,int playerInput[2][20][20],char ship
     for (int col = 0; col < size; col++){
         printf("|");
         int v = playerInput[player][row][col];
-        if (v < 0 || v >= 14) {
-            printf("??  "); // fallback idk im troubleshooting here
-        } else {
-            printf("%s", shipValueAbrv[v]);
-        }
-
+        int v2 = playerInput[!player][row][col];
+            if(CHECK[player][row][col] != 0){
+                if((v2 % 2) == 1 && v2 > 2){
+                    printf("%sH", shipValueAbrv[v]);
+                }else{
+                    printf("%sM", shipValueAbrv[v]);
+                }
+            }else{
+                printf("%s ", shipValueAbrv[v]);
+            }
     }
+
     printf("|");
 }
 
@@ -284,7 +289,7 @@ void pause(){
             printf("Invalid Input");
         }
         if(pauseIn == 'L' || pauseIn == 'l'){
-            printf("Don't give up now! We haven't developed a way for you to lose :\ ");
+            surrender();
         }
     }
         // INSERT WIN CONDITION WILL NEED TO USE POINTER TO ACCESS AND CHANGE
@@ -307,7 +312,7 @@ void transistion(int booleanTurn){
 
 
 void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], char shipValueAbrv[14][5],
-                bool *screenShake){
+                bool *screenShake, bool airstrikeMode){
     selectionStart:
 
     char input, orientation;
@@ -316,7 +321,6 @@ void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], c
     int attackRow = 0;
     int attackCol = 0;
     int scoreArray[5];
-    static int CHECK[2][20][20] = {0}; // static so its not redefined every time
 
     input = 0; // reset the input so while loop triggers again
     newRow = attackRow;
@@ -352,12 +356,7 @@ void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], c
                 newRow = size - 1;
             if(newRow > size - 1)
                 newRow = 0;
-            /*
-            if(playerData[turn][newRow][newCol] % 12 != 0){ //checking the validity of the square
-                printf("This Cell is Taken, Try Again!\n");
-                continue;
-            }
-            */
+
             attackCol = newCol;
             attackRow = newRow;
             prevLocation = playerData[turn][attackRow][attackCol];
@@ -369,6 +368,10 @@ void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], c
                 playerData[(!turn)][newRow][newCol] += 1;
                 if(playerData[(!turn)][newRow][newCol] % 2 == 1 && playerData[(!turn)][newRow][newCol] > 2){
                     *screenShake = true;
+                    if(airstrikeMode == true){
+                        CHECK[turn][newRow][newCol]++;
+                        goto selectionStart;
+                    }
                 }
                 CHECK[turn][newRow][newCol]++;
             }
@@ -377,7 +380,7 @@ void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], c
 
 int getSize(int *sizeF){
     int count = 0, out = 0;
-    printf("What size would you like the board to be?\n");
+    printf("\nWhat size would you like the board to be?\n");
 
     while(out > MAX_SIZE || out < MIN_SIZE){
         if(count != 0){
@@ -393,6 +396,16 @@ int getSize(int *sizeF){
     return 1;
 }
 
+void getMode(bool *airStrikeMode){
+    char out = 0;
+    printf("\nWould you like to play Airstrike Mode? Y/N\n");
+    while(!validateUserInput(&out)){ // running validation check for user input
+                printf("Invalid Input\n");
+    }
+    if (out == 'Y' || out == 'y'){
+        *airStrikeMode = true;
+    }
+}
 
 void displayBoardHeader(int booleanTurn, char player[2][100]) {
     int gridWidth = size * 5 + 1;  // width of one grid
@@ -407,6 +420,8 @@ void displayBoardHeader(int booleanTurn, char player[2][100]) {
         printf(" ");
     }
     printf("Fog of War\n");
+    printf("\n Points %d\n", playerPoints[booleanTurn]);
+
 
 }
 
@@ -421,14 +436,23 @@ void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanT
         }
 }
 
-void winCondition(int playerData[2][20][20], int booleanTurn, int points[2]){
+void winCondition(int playerData[2][20][20], int booleanTurn){
     int pointNumber[5] = {1000, 750, 500, 500, 100};
+    static int PCHECK[2][20][20] = {0}; // static so its not redefined every time
     for(int i = 0; i < size; i++){
         for(int j = 0; j < size; j++){
             if(playerData[(!booleanTurn)][i][j] % 2 == 1 && playerData[(!booleanTurn)][i][j] > 2){
-                for(int k = 1; k < 5; k++){
-                    if(!(playerData[(!booleanTurn)][i][j] % (2*k+1))){
-                        points[booleanTurn] += pointNumber[k];
+                for(int k = 0; k < 5; k++){
+                    if(!(playerData[(!booleanTurn)][i][j] % (2*k+3))){
+                        if(PCHECK[booleanTurn][i][j] == 0){
+                            oldPlayerPoints[booleanTurn] = playerPoints[booleanTurn];
+                            if(playerData[!booleanTurn][i][j] == 9){
+                                playerPoints[booleanTurn] += 500;
+                            } else {
+                                playerPoints[booleanTurn] += pointNumber[k];
+                            }
+                            PCHECK[booleanTurn][i][j]++;
+                        }
                     }
                 }
             }
