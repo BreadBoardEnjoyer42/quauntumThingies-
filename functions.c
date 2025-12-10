@@ -176,6 +176,8 @@ void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], in
         while(!((input=='q')||(input=='Q'))){
             displayBoard(playerName, 0, turn, playerData, shipValueAbrv); // show placement
             printf("\nEnter a direction with W/A/S/D, Q when finished\n");
+            printf("Boats are placed from largest(5) to smallest(2) with the option\n");
+            printf("of rotating it right or downward\n");
 
             while(!validateUserInput(&input)){ // running validation check for user input
                 printf("Invalid Input");
@@ -397,7 +399,7 @@ void getMode(bool *airStrikeMode){
     char out = 0;
     printf("\nWould you like to play Airstrike Mode? Y/N\n");
     while(!validateUserInput(&out)){ // running validation check for user input
-                printf("Invalid Input\n");
+        printf("Invalid Input\n");
     }
     if (out == 'Y' || out == 'y'){
         *airStrikeMode = true;
