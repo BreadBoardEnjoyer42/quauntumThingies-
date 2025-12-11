@@ -83,7 +83,7 @@ int startScreen(int option){ // main screen code, helps select and change user i
 
 
 // Display Board Function to show the board with improved GUI
-void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int playerInput[2][20][20],
+void displayBoard(char player[2][31], bool screenShake, int booleanTurn, int playerInput[2][15][15],
                   char shipValueAbrv[14][5]){
     system("cls"); // clears terminal
     displayBoardHeader(booleanTurn, player); // For centering the headers for the fog of war and player data because board is variable
@@ -119,7 +119,7 @@ void displayBoard(char player[2][100], bool screenShake, int booleanTurn, int pl
     }
 }
 
-void printPlayerBoardRow(int player,int row,int playerInput[2][20][20],char shipValueAbrv[14][5]){
+void printPlayerBoardRow(int player,int row,int playerInput[2][15][15],char shipValueAbrv[14][5]){
     for (int col = 0; col < size; col++){
         printf("|");
         int v = playerInput[player][row][col];
@@ -129,7 +129,7 @@ void printPlayerBoardRow(int player,int row,int playerInput[2][20][20],char ship
     printf("|");
 }
 
-void printPlayerFogBoardRow(int player,int row,int playerInput[2][20][20],char shipValueAbrv[14][5]){
+void printPlayerFogBoardRow(int player,int row,int playerInput[2][15][15],char shipValueAbrv[14][5]){
     for (int col = 0; col < size; col++){
         int v2 = playerInput[!player][row][col];
         printf("|");
@@ -155,7 +155,7 @@ void printPlayerFogBoardRow(int player,int row,int playerInput[2][20][20],char s
 
 
 // Handling User Input for Boat Placement Function
-void getUserBoatPlacement(int playerData[2][20][20], char playerName[2][100], int turn,
+void getUserBoatPlacement(int playerData[2][15][15], char playerName[2][31], int turn,
                           int boatLength[5], int shipValueType[5],char shipValueAbrv[14][5],
                           char ships[5][20]){
 
@@ -310,7 +310,7 @@ void transistion(int booleanTurn){
 
 
 
-void attackSmack(int turn, int playerData[2][20][20], char playerName[2][100], char shipValueAbrv[14][5],
+void attackSmack(int turn, int playerData[2][15][15], char playerName[2][31], char shipValueAbrv[14][5],
                 bool *screenShake, bool airstrikeMode){
     selectionStart:
 
@@ -406,7 +406,7 @@ void getMode(bool *airStrikeMode){
     }
 }
 
-void displayBoardHeader(int booleanTurn, char player[2][100]) {
+void displayBoardHeader(int booleanTurn, char player[2][31]) {
     int gridWidth = size * 5 + 1;  // width of one grid
     int sizePlayerOffset = strlen("Player #'s Board: ") + strlen(player[booleanTurn]); // how long is said string
     int sizeFogOffset = strlen("Fog of War");
@@ -424,7 +424,7 @@ void displayBoardHeader(int booleanTurn, char player[2][100]) {
 
 }
 
-void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanTurn){
+void findEmptyCell(int playerData[2][15][15], int *hori, int *vert, int booleanTurn){
         while(playerData[booleanTurn][*vert][*hori] != 0){ // CHECKING TO SEE THE NEXT VALID PLACE TO PUT THE CURSOR
             (*hori)++;
             if((*hori) >= size){ // IF MAX THEN GO DOWN A LINE
@@ -435,7 +435,7 @@ void findEmptyCell(int playerData[2][20][20], int *hori, int *vert, int booleanT
         }
 }
 
-void winCondition(int playerData[2][20][20], int booleanTurn){
+void winCondition(int playerData[2][15][15], int booleanTurn){
     int pointNumber[5] = {1000, 750, 500, 500, 100};
     static int PCHECK[2][20][20] = {0}; // static so its not redefined every time
     for(int i = 0; i < size; i++){
